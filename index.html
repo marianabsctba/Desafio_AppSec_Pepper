@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APPSEC PEPPER - BE SAFE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Cinzel:wght@400;700;900&family=Great+Vibes&display=swap');
+:root {
+  --bg:#120604; --bg2:#210807; --panel:#2b0d09; --card:#35110d;
+  --pepper:#ff2b18; --pepper2:#ff6b00; --gold:#ffd36a; --green:#00ff88;
+  --text:#ffe9dc; --muted:#c08b78; --dim:#744038; --bad:#ff4f5e;
+  --line:rgba(255,107,0,.28); --shadow:0 0 28px rgba(255,43,24,.22);
+  --mono:'Share Tech Mono',monospace; --display:'Orbitron',sans-serif; --body:'Rajdhani',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;background:
+  radial-gradient(circle at 15% 0%, rgba(255,43,24,.22), transparent 36%),
+  radial-gradient(circle at 85% 12%, rgba(255,211,106,.12), transparent 28%),
+  linear-gradient(180deg,#120604,#220807 45%,#0b0302);
+  color:var(--text);font-family:var(--body);font-weight:700;overflow-x:hidden;
+}
+body:before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 5px);pointer-events:none;z-index:9999}
+code,pre,.mono{font-family:var(--mono)}
+.header{position:sticky;top:0;z-index:50;padding:12px 28px;background:rgba(18,6,4,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:center}
+.logo{font-family:var(--display);letter-spacing:3px;color:var(--pepper2);font-size:12px;text-transform:uppercase}
+.status{display:flex;gap:12px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--green)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.screen{display:none} .screen.active{display:block}
+.hero{max-width:1100px;margin:auto;padding:62px 20px 48px;min-height:calc(100vh - 52px);display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:32px}.header{padding:10px 14px;align-items:flex-start;flex-direction:column}}
+.badge{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);padding:7px 14px;font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:2px;background:rgba(255,107,0,.08);margin-bottom:24px}
+.pepper-icon{font-size:42px;filter:drop-shadow(0 0 18px rgba(255,43,24,.8));display:inline-block;animation:wobble 2.4s ease-in-out infinite}
+@keyframes wobble{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg) scale(1.05)}}
+h1{font-family:var(--display);font-size:clamp(34px,6vw,76px);line-height:1.02;letter-spacing:2px;color:#fff;text-shadow:0 0 36px rgba(255,43,24,.42);margin-bottom:16px}
+h1 span{color:var(--pepper)}
+.sub{font-size:19px;line-height:1.65;color:#f3b9a4;max-width:690px}
+.warn{margin-top:28px;border:1px solid rgba(255,211,106,.35);border-left:4px solid var(--gold);background:rgba(255,211,106,.08);padding:16px 18px;line-height:1.55;color:#ffe2a0}
+.form-card{background:linear-gradient(180deg,rgba(53,17,13,.95),rgba(28,7,5,.95));border:1px solid var(--line);box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden}
+.form-card:before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--pepper),var(--gold),transparent)}
+.card-title{font-family:var(--display);font-size:12px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px}
+label.small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin:14px 0 7px}
+input,textarea,select{width:100%;background:#130503;border:1px solid var(--line);color:var(--text);font-family:var(--body);font-size:16px;font-weight:700;padding:12px 14px;outline:none}
+input:focus,textarea:focus{border-color:var(--pepper);box-shadow:0 0 0 2px rgba(255,43,24,.12)}
+.btn{border:1px solid var(--pepper);background:transparent;color:var(--pepper);font-family:var(--display);letter-spacing:2px;text-transform:uppercase;padding:13px 20px;cursor:pointer;font-size:12px;transition:.2s;font-weight:900}
+.btn:hover{background:var(--pepper);color:#160302;box-shadow:0 0 24px rgba(255,43,24,.5)}
+.btn.gold{border-color:var(--gold);color:var(--gold)} .btn.gold:hover{background:var(--gold);color:#160302}
+.btn.green{border-color:var(--green);color:var(--green)} .btn.green:hover{background:var(--green);color:#00170c}
+.main{max-width:1420px;margin:0 auto;padding:26px 18px 70px}
+.topline{display:flex;gap:18px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px;flex-wrap:wrap}
+.title2{font-family:var(--display);font-size:16px;color:var(--gold);letter-spacing:3px}
+.progress{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.scenario{background:rgba(43,13,9,.86);border:1px solid var(--line);border-left:4px solid var(--pepper);padding:20px 22px;line-height:1.7;margin-bottom:20px}
+.scenario h3,.section-label{font-family:var(--display);font-size:12px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.scenario p{margin:8px 0}
+.owasp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}
+.owasp-item{border:1px solid rgba(255,107,0,.22);background:rgba(0,0,0,.25);padding:9px;font-family:var(--mono);font-size:10px;color:#ffd9c8;line-height:1.35}
+@media(max-width:900px){.owasp-grid{grid-template-columns:1fr 1fr}}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.tab{padding:10px 12px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer}
+.tab.active{color:#fff;border-color:var(--pepper);background:rgba(255,43,24,.12)}
+.evidence{display:none} .evidence.active{display:block}
+.evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:980px){.evidence-grid{grid-template-columns:1fr}}
+.panel{background:#120503;border:1px solid var(--line);overflow:hidden}
+.panel-head{background:rgba(255,107,0,.07);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.panel-title{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:1.6px;text-transform:uppercase}
+.panel-body{padding:14px;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#ffd0bd;max-height:390px;overflow:auto;white-space:pre-wrap}
+.hl{color:var(--gold)} .red{color:#ff6b75} .green{color:#00ff88} .orange{color:#ff9b45} .muted{color:#9c6657}
+.searchbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.searchbar input{flex:1;min-width:240px}
+.question-card{background:var(--card);border:1px solid var(--line);margin:14px 0;overflow:hidden}
+.q-head{display:flex;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line);align-items:flex-start}
+.q-num{font-family:var(--display);font-size:11px;color:var(--gold);border:1px solid rgba(255,211,106,.35);padding:4px 9px;background:rgba(255,211,106,.08);flex-shrink:0}
+.q-text{font-size:15px;line-height:1.55;color:#fff}
+.opts{padding:14px 18px;display:grid;gap:10px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid transparent;background:rgba(0,0,0,.25);padding:11px 13px;color:#d9a391;cursor:pointer;line-height:1.45;font-size:14px}
+.opt:hover{border-color:var(--line);color:#fff;background:rgba(255,107,0,.05)}
+.opt input{display:none}
+.mark{font-family:var(--mono);font-size:11px;border:1px solid var(--dim);width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;color:var(--muted)}
+.opt:has(input:checked){border-color:var(--pepper);background:rgba(255,43,24,.08);color:#fff}
+.opt:has(input:checked) .mark{background:var(--pepper);border-color:var(--pepper);color:#210302}
+.opt.correct{border-color:rgba(0,255,136,.55)!important;background:rgba(0,255,136,.08)!important;color:#a9ffd5!important}
+.opt.wrong{border-color:rgba(255,79,94,.55)!important;background:rgba(255,79,94,.08)!important;color:#ffb6bd!important}
+.actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:28px 0}
+.results{display:none;margin-top:22px}
+.score{background:rgba(53,17,13,.9);border:1px solid var(--line);text-align:center;padding:28px;box-shadow:var(--shadow)}
+.score-num{font-family:var(--display);font-size:64px;line-height:1;color:#fff;margin-bottom:8px}
+.score-msg{color:#f1b59f;font-size:16px;line-height:1.6;max-width:760px;margin:auto}
+.comment{background:rgba(43,13,9,.9);border:1px solid var(--line);margin:12px 0;padding:15px;line-height:1.65}
+.comment strong{color:var(--gold)}
+.cert-wrap{display:none;margin-top:26px}
+.cert-lock{display:none;border:1px solid rgba(255,79,94,.35);background:rgba(255,79,94,.07);padding:16px;color:#ffb6bd;margin-top:20px}
+#certificate{width:1050px;min-height:720px;background:
+  radial-gradient(circle at 50% 35%, rgba(255,255,255,.9), rgba(255,245,226,.82) 34%, rgba(242,220,176,.96) 100%);
+  color:#2b1208;position:relative;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.7);font-family:Georgia,serif;margin:0 auto 18px;
+}
+.cert-border{position:absolute;inset:20px;border:3px solid #7a1a10} .cert-border2{position:absolute;inset:31px;border:1px solid rgba(122,26,16,.45)}
+.cert-water{position:absolute;inset:auto 0 205px;text-align:center;font-family:var(--display);font-size:92px;color:rgba(122,26,16,.055);letter-spacing:18px}
+.cert-content{position:relative;z-index:2;padding:54px 82px;text-align:center}
+.cert-kicker{font-family:'Cinzel',serif;letter-spacing:5px;font-size:14px;color:#7a1a10;text-transform:uppercase;margin-bottom:18px}
+.cert-pepper{font-size:54px;margin-bottom:5px;filter:drop-shadow(0 6px 12px rgba(122,26,16,.2))}
+.cert-title{font-family:'Cinzel',serif;font-size:43px;letter-spacing:4px;color:#2b1208;text-transform:uppercase;line-height:1.15}
+.cert-sub{font-family:'Cinzel',serif;font-size:15px;letter-spacing:5px;color:#7a1a10;text-transform:uppercase;margin:8px 0 28px}
+.cert-line{height:1px;background:linear-gradient(90deg,transparent,#7a1a10,transparent);margin:16px 0 22px}
+.cert-name{font-family:'Cinzel',serif;font-size:42px;color:#3d140b;margin:8px 0 18px;line-height:1.1}
+.cert-body{font-size:15px;line-height:1.85;color:#472418;max-width:820px;margin:auto}
+.cert-meta{display:flex;justify-content:center;gap:34px;flex-wrap:wrap;margin:25px 0}
+.meta-box{border-top:1px solid #7a1a10;padding-top:7px;min-width:150px}
+.meta-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#7a1a10;text-transform:uppercase}
+.meta-value{font-size:13px;font-weight:bold;margin-top:3px}
+.sig{margin-top:26px;display:flex;justify-content:center;align-items:flex-end;gap:50px}
+.signature{font-family:'Great Vibes',cursive;font-size:34px;color:#2b1208}
+.sig-line{width:230px;height:1px;background:#7a1a10;margin:0 auto 5px}
+.sig-role{font-size:12px;color:#7a1a10;letter-spacing:1px}
+.seal{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,#b32012,#601006);border:4px solid #7a1a10;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cinzel',serif;font-size:10px;line-height:1.35;box-shadow:0 6px 18px rgba(0,0,0,.24)}
+@media(max-width:1100px){#certificate{width:100%;min-height:auto}.cert-content{padding:38px 30px}.cert-title{font-size:28px}.cert-name{font-size:30px}.cert-water{font-size:48px;letter-spacing:7px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">🌶 APPSEC PEPPER - BE SAFE // OWASP TOP 10:2025</div>
+  <div class="status"><span class="dot"></span><span>SISTEMA PICANTE</span><span id="clock">--:--:--</span></div>
+</header>
+
+<section id="intro" class="screen active">
+  <div class="hero">
+    <div>
+      <div class="badge"><span class="pepper-icon">🌶</span> LAB INTERATIVO // APPSEC HARD MODE</div>
+      <h1>APPSEC <span>PEPPER</span><br>BE SAFE</h1>
+      <p class="sub">Você é a pessoa chamada quando a aplicação já virou churrasco corporativo. A missão: investigar uma API realista, correlacionar logs, código, pipeline e comportamento de negócio, e mapear o incidente ao <strong>OWASP Top 10:2025</strong>. Sem resposta mastigada. Aqui a pimenta arde em produção.</p>
+      <div class="warn">Este desafio exige análise manual. As perguntas, alternativas e comentários estão ofuscados com salt + XOR no código-fonte. As alternativas foram balanceadas para parecerem plausíveis; existe uma opção mais correta, não uma opção gritante usando camiseta neon.</div>
+    </div>
+    <div class="form-card">
+      <div class="card-title">IDENTIFICAÇÃO PARA CERTIFICADO</div>
+      <label class="small" for="name">Nome completo</label>
+      <input id="name" placeholder="Digite o nome para o certificado">
+      <label class="small" for="date">Data de conclusão</label>
+      <input id="date" type="date">
+      <label class="small" for="mode">Modo de avaliação</label>
+      <select id="mode"><option value="90">Pimenta forte: certificado com mínimo de 90%</option><option value="100">Carolina Reaper: certificado só com 100%</option></select>
+      <button class="btn" style="width:100%;margin-top:22px" onclick="start()">INICIAR INVESTIGAÇÃO</button>
+    </div>
+  </div>
+</section>
+
+<section id="challenge" class="screen">
+  <main class="main">
+    <div class="topline">
+      <div>
+        <div class="title2">CASO #APP-PEPPER-2025-042 // PEPPERPAY API</div>
+        <div class="progress" id="progress">0 de 10 respondidas</div>
+      </div>
+      <button class="btn gold" onclick="window.scrollTo({top:0,behavior:'smooth'})">VOLTAR AO TOPO</button>
+    </div>
+
+    <div class="scenario">
+      <h3>BRIEFING DA HISTÓRIA</h3>
+      <p>A PepperPay é uma fintech fictícia, mas dolorosamente familiar: API REST, microserviços, containers, gateway, JWT, CI/CD, pacote npm interno, bucket de artefatos e pressa executiva. O time de negócio ativou uma campanha de cashback. Três horas depois, surgiram exportações indevidas, reembolsos aprovados sem alçada e um deploy “normal” que cheira a fumaça.</p>
+      <p>Você recebeu evidências de aplicação, WAF/API Gateway, código, CI/CD, banco, logs de autenticação e alertas. A análise deve mapear o que aconteceu às categorias oficiais do <strong>OWASP Top 10:2025</strong>: A01 Broken Access Control, A02 Security Misconfiguration, A03 Software Supply Chain Failures, A04 Cryptographic Failures, A05 Injection, A06 Insecure Design, A07 Authentication Failures, A08 Software or Data Integrity Failures, A09 Security Logging and Alerting Failures e A10 Mishandling of Exceptional Conditions.</p>
+      <div class="owasp-grid">
+        <div class="owasp-item">A01 Broken Access Control</div><div class="owasp-item">A02 Security Misconfiguration</div><div class="owasp-item">A03 Software Supply Chain Failures</div><div class="owasp-item">A04 Cryptographic Failures</div><div class="owasp-item">A05 Injection</div>
+        <div class="owasp-item">A06 Insecure Design</div><div class="owasp-item">A07 Authentication Failures</div><div class="owasp-item">A08 Software/Data Integrity Failures</div><div class="owasp-item">A09 Logging & Alerting Failures</div><div class="owasp-item">A10 Mishandling Exceptional Conditions</div>
+      </div>
+    </div>
+
+    <div class="searchbar">
+      <input id="filter" placeholder="Filtrar evidências por termo: tenant, token, deploy, actuator, export, etc." oninput="filterEvidence()">
+      <button class="btn gold" onclick="clearFilter()">LIMPAR FILTRO</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('api', this)">API / Gateway</button>
+      <button class="tab" onclick="showTab('code', this)">Código Vulnerável</button>
+      <button class="tab" onclick="showTab('cicd', this)">CI/CD / Supply Chain</button>
+      <button class="tab" onclick="showTab('auth', this)">Auth / Cripto</button>
+      <button class="tab" onclick="showTab('detect', this)">Logs / Alerting</button>
+    </div>
+
+    <section id="api" class="evidence active">
+      <div class="evidence-grid">
+        <div class="panel"><div class="panel-head"><span class="panel-title">API Gateway - access.log</span><span class="panel-title">PROD</span></div><div class="panel-body evidence-text">
+2025-11-18T02:13:04Z 198.51.100.77 GET /api/v2/orders/9911 status=403 user=ana role=user tenant=blue org=blue
+2025-11-18T02:13:12Z 198.51.100.77 GET /api/v2/admin/orders/export status=403 user=ana role=user tenant=blue org=blue
+2025-11-18T02:13:25Z 198.51.100.77 GET /api/v2/admin/orders/export status=200 user=ana role=user tenant=blue header.X-Org-Id=red bytes=884231
+2025-11-18T02:14:02Z 198.51.100.77 GET /api/v2/search?q=' OR tenant_id LIKE '%' -- status=200 user=ana rows=48113 latency=913ms
+2025-11-18T02:14:41Z 198.51.100.77 PATCH /api/v2/refunds/7781 body.clientState=approved status=200 user=ana amount=18400
+2025-11-18T02:15:08Z 198.51.100.77 POST /api/v2/webhooks/deploy status=202 signature=missing provider_timeout=true fallback=allow
+2025-11-18T02:15:33Z 198.51.100.77 GET /actuator/env status=200 user=anonymous bytes=12991
+2025-11-18T02:15:49Z 198.51.100.77 GET /debug/trace/latest status=200 user=anonymous contains=DB_URL,JWT_SECRET_ALIAS,BUILD_REGISTRY
+        </div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">WAF / API Protection</span><span class="panel-title">ALERTS</span></div><div class="panel-body evidence-text">
+02:13:12 LOW   Repeated 403 admin endpoint from authenticated user. No alert route configured.
+02:13:25 INFO  Unusual header X-Org-Id received. Action: observe. Reason: header used by legacy partner.
+02:14:02 MED   SQL-like token in query param q. Action: log_only. Rule in monitor mode after "false positive Friday".
+02:14:41 LOW   Refund approval from non-admin role. Action: allow. Reason: business API owns authorization.
+02:15:08 HIGH  Webhook signature missing. Action: allow. Reason: upstream timeout, degraded mode enabled.
+02:15:33 LOW   /actuator/env exposed. Action: allow internal? Source treated public due missing network tag.
+02:15:49 MED   Debug endpoint accessed from internet. Action: log_only. Escalation target: none.
+        </div></div>
+      </div>
+    </section>
+
+    <section id="code" class="evidence">
+      <div class="evidence-grid">
+        <div class="panel"><div class="panel-head"><span class="panel-title">orders.controller.ts</span><span class="panel-title">TRECHO</span></div><div class="panel-body evidence-text">
+router.get('/admin/orders/export', requireAuth, async (req, res) => {
+  const org = req.headers['x-org-id'] || req.user.tenant;
+  // TODO: partner migration. Temporary. Famous last words.
+  if (!req.user) return res.status(401).end();
+  const rows = await db.query(`select * from orders where tenant_id = '${org}'`);
+  return res.json({ exportedBy: req.user.email, rows });
+});
+
+router.get('/search', requireAuth, async (req, res) => {
+  const q = req.query.q || '';
+  const sql = `select id,total,tenant_id from orders where note like '%${q}%'`;
+  const rows = await db.query(sql);
+  return res.json(rows);
+});
+        </div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">refunds.controller.ts</span><span class="panel-title">TRECHO</span></div><div class="panel-body evidence-text">
+router.patch('/refunds/:id', requireAuth, async (req, res) => {
+  const refund = await db.refunds.find(req.params.id);
+  refund.state = req.body.clientState; // approved, denied, pending
+  refund.updatedBy = req.user.email;
+  await refund.save();
+  audit.info('refund state changed', { id: refund.id, state: refund.state });
+  res.json({ ok: true, state: refund.state });
+});
+
+// A regra real deveria viver no servidor: alçada, estado anterior, segregação e aprovação.
+        </div></div>
+      </div>
+    </section>
+
+    <section id="cicd" class="evidence">
+      <div class="evidence-grid">
+        <div class="panel"><div class="panel-head"><span class="panel-title">CI/CD Pipeline</span><span class="panel-title">BUILD #8821</span></div><div class="panel-body evidence-text">
+02:05:11 npm ci --prefer-offline
+02:05:14 WARN package @pepper/formatter resolved from https://npm.pepper-cdn.example/legacy
+02:05:15 WARN lockfile integrity mismatch for @pepper/formatter expected sha512-4b1... got sha512-9fd...
+02:05:17 INFO policy: integrity_mismatch=warn
+02:06:04 INFO image pepperpay-api:2025.11.18-8821 built
+02:06:42 INFO SBOM generated but not enforced
+02:07:10 INFO deploy approved by automation user cicd-bot
+02:07:31 INFO production rollout 100%
+        </div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">Webhook deploy handler</span><span class="panel-title">TRECHO</span></div><div class="panel-body evidence-text">
+if (!verifySignature(req)) {
+  if (providerHealth.timeout) {
+    logger.warn('signature missing, provider timeout, degraded allow');
+    return enqueueDeploy(req.body); // fail open
+  }
+  return res.status(401).end();
+}
+return enqueueDeploy(req.body);
+
+// Tradução executiva: "segurança caiu, então vamos confiar mais ainda". Excelente ideia para virar estudo de caso.
+        </div></div>
+      </div>
+    </section>
+
+    <section id="auth" class="evidence">
+      <div class="evidence-grid">
+        <div class="panel"><div class="panel-head"><span class="panel-title">Auth / Sessions</span><span class="panel-title">LOGS</span></div><div class="panel-body evidence-text">
+01:33:09 password_reset requested user=ana email=a***@pepperpay.example ip=198.51.100.77
+01:34:02 reset token issued ttl=24h reusable=true token_id=rst_29a7
+02:11:57 password changed user=ana token_id=rst_29a7 ip=198.51.100.77
+02:12:01 session preserved user=ana old_session=sess_91af reason=preserve_cart
+02:12:22 jwt issued alg=RS256 role=user tenant=blue exp=8h
+02:13:25 export used role=user tenant=blue X-Org-Id=red
+        </div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">Crypto / Data Handling</span><span class="panel-title">CONFIG</span></div><div class="panel-body evidence-text">
+cookie session_id: HttpOnly=true; Secure=false; SameSite=Lax
+backup export: pii-backup-2025-11-17.enc mode=AES-ECB
+reset token: random 128-bit, ttl=24h, reusable=true
+JWT secret alias leaked in debug: JWT_SECRET_ALIAS=pepper-prod-signing-2024
+TLS edge: TLS 1.3 enabled
+        </div></div>
+      </div>
+    </section>
+
+    <section id="detect" class="evidence">
+      <div class="evidence-grid">
+        <div class="panel"><div class="panel-head"><span class="panel-title">Detection Timeline</span><span class="panel-title">SIEM</span></div><div class="panel-body evidence-text">
+02:13:12 event=admin_403 user=ana severity=info alert=false
+02:13:25 event=admin_export_200 user=ana role=user tenant=blue x_org=red severity=info alert=false
+02:14:02 event=search_sql_token user=ana severity=medium alert=false rule_mode=monitor
+02:14:41 event=refund_approved user=ana role=user amount=18400 severity=low alert=false
+02:15:08 event=webhook_signature_missing severity=high alert=false route=unassigned
+02:15:33 event=actuator_env_public severity=low alert=false owner=null
+02:18:30 event=data_volume_anomaly exported_rows=48113 severity=critical alert=true
+02:19:40 incident_created title="Possible data exposure" after_exfil=true
+        </div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">Stack trace público</span><span class="panel-title">/debug/trace/latest</span></div><div class="panel-body evidence-text">
+TypeError: Cannot read properties of null (reading 'role')
+ at authorizeTenant (/srv/app/authz.js:88)
+ request.headers['x-org-id']=red
+ request.user.tenant=blue
+ DB_URL=postgres://pepper-prod-db:5432/pepper
+ BUILD_REGISTRY=https://npm.pepper-cdn.example/legacy
+ JWT_SECRET_ALIAS=pepper-prod-signing-2024
+ handled=false => response=200 degraded=true
+        </div></div>
+      </div>
+    </section>
+
+    <div class="section-label">QUESTÕES DE ANÁLISE // OWASP TOP 10:2025</div>
+    <div id="questions"></div>
+
+    <div class="actions">
+      <button class="btn" onclick="grade()">CORRIGIR DESAFIO</button>
+      <button class="btn gold" onclick="resetAnswers()">REFAZER RESPOSTAS</button>
+    </div>
+
+    <section id="results" class="results">
+      <div class="score">
+        <div id="scoreNum" class="score-num">0%</div>
+        <div id="scoreMsg" class="score-msg"></div>
+      </div>
+      <div id="comments"></div>
+      <div id="certLock" class="cert-lock"></div>
+      <div id="certWrap" class="cert-wrap">
+        <div id="certificate">
+          <div class="cert-border"></div><div class="cert-border2"></div><div class="cert-water">BE SAFE</div>
+          <div class="cert-content">
+            <div class="cert-pepper">🌶</div>
+            <div class="cert-kicker">Certificado de Conclusão</div>
+            <div class="cert-title">APPSEC PEPPER</div>
+            <div class="cert-sub">BE SAFE // OWASP TOP 10:2025</div>
+            <div class="cert-line"></div>
+            <div class="cert-body">Certificamos que</div>
+            <div id="certName" class="cert-name">NOME</div>
+            <div class="cert-body">
+              concluiu o desafio prático <strong>APPSEC PEPPER - BE SAFE</strong>, com investigação manual de falhas de aplicação, correlação de evidências, análise de código, autenticação, autorização, pipeline CI/CD, supply chain, logging/alerting e mapeamento aos riscos do OWASP Top 10:2025.
+            </div>
+            <div class="cert-meta">
+              <div class="meta-box"><div class="meta-label">Data</div><div id="certDate" class="meta-value">--</div></div>
+              <div class="meta-box"><div class="meta-label">Carga horária</div><div class="meta-value">12 horas</div></div>
+              <div class="meta-box"><div class="meta-label">Aproveitamento</div><div id="certScore" class="meta-value">--</div></div>
+              <div class="meta-box"><div class="meta-label">Hash</div><div id="certHash" class="meta-value">--</div></div>
+            </div>
+            <div class="sig">
+              <div>
+                <div class="signature">Mariana BS</div>
+                <div class="sig-line"></div>
+                <div class="sig-role">Instrutora // Be Safe</div>
+              </div>
+              <div class="seal">APPSEC<br>PEPPER<br>2025</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn green" onclick="downloadCert()">BAIXAR CERTIFICADO PNG</button>
+      </div>
+    </section>
+  </main>
+</section>
+
+<script>
+const SALT = "APPSEC-PEPPER-BE-SAFE-OWASP2025-SALT-v3";
+const ENCODED = [{"map": "AGBhaXdzH2VlEiIqOUgsZWwwIiM2Xm8ULj0kQF9e", "q": "Dz9wNisnXT8sPiRlfUwyLAIlc2kkSSI+L3w/QFRXR158JDQkQgRHbXAhJiQvDTYkPDgkckg6NUE6IidlQCo7KTwiEl8SVE42Mj87DR9dJTUmOiEsDT8nJDkhPQ0yKl9zNCtlWDwigvIiW18SVkI+NCF4DRVcLyM5NyAxTD4hP3AqcmcVEQ03JGY3QiMyfCYjV0IeFUJzIi02SLWUIDw4PGUbAB83N30MNg0vJEM6MTMpTCs4YTZwXRBAUFk8MyI7DT5nFQBwYXVzDTMqPXAhM0ktNg03JGYqWDslLnMkV15TW1ls", "opts": [{"k": "a", "t": "BzE8OyRjXSIsPZPkIEQjZUk2YQUKfxx7YSM/QEFHUA0yYSMmRBFWLHA1KzEmXz4kcDE1M18nJkhzLyllTi41JJD3U1xaWg02YSUnXhkTMjU9IzcmDSAgIj0sJkhiKUg6NTM3TG80MzwjQR1dR0Q0KCJ0XRNfLnAxJyQgTD4xNX4="}, {"k": "b", "t": "Aj8+JzcsQTVlNDVlM04nNl48YTcwSC0lIDc/HhBCWl8iNCl0TFZSNCQ/ISw5TJPik/Mqck4tK0s6LjNlSCJ3MTIi8ZJfUFkhLj90ThldNSI/P4biWzUsI3AgckOB5kJzNycpRCs4NHMkV15TW1l8MyM4SFZdLnAjNjc1RDQqIn4="}, {"k": "c", "t": "AiI5IzEsSiIkNjkkckswJE4ybWY1Qj0mNDZwXRB4YnlzJD8gTABSYTU9cwciXjVzZAUXHg0nZV08M2YsXjw4YSIlU1xDQEghYS84TB9eYTk+JyAxQzFlID8hN18rJA0gJDRlTiA5Mjo0V0JTUUxzMik3XxNHIH4="}, {"k": "d", "t": "DT83NCwtSnAsPiMwNEQhLEg9NSNpDT84MyIlVxBdFUglJCIgQlZdgvM/cyImXz8wcDEpN182JA0wM4XoWSY0LnMxXERXRg03IGwxVQZcMyQxkOKAjj9lNDVlIkgmLEk8MmYkSSI+LzojRkJTQUQlLj96"}], "ans": "Iw==", "comment": "AHA1JSwn7vorMzkkckAjLF5zJyk3WSp3gvpwUxBWUE46Mo/3QlZXJHAxJjEsXzk/MZPikY4tZUwwJC8xTD13Mzw8Vw1HRkghYWd0dVt8Mzd9GiFjTDwxNSIkNkJiNUwhIGYkTiokMjIiEkJXVlghMiN0TBJeKD45IDExTCQsJj9lNw0mJEk8MmYhSG84NCciXRBGUEMyLzh6DT9AMj9wkOxjbyIqOzUrcmwhJkggMmYGQiEjMzw8CBBdFV42Mzo9SRlBYT6T8CpjXT8hNXAmPUMkLEwhYSMoDSw7IDo9HhBaUEw3JD50QgMTMTEikOcuSCQ3P3A2N0BiIEM1LjQmSCIyLydwQF9QQF4nLmw6QlZRIDM7NisnA3AGHwIWfg0uKko0KCgiDSp3IiE5QkRdUl8yJyU1DQZcJTU9cyYsSCgsIyQsIAFiKEwgYSiGjiB3MpDzXRBTFU4yND81DQRSKCpwNypjH2B1cDkrNkg0LEk8bw=="}, {"map": "AGBiaXdzH2VlAzUmJ18rMVRzDC82TiA5Jzo3R0JTQUQ8Lw==", "q": "ECUxP2UgQj4jOTcwIEyB4u7wLmYgVT84MicxElFHWEg9NS10QBdaMnA/czcqXjMqcD81N18jJkQ8LycpDSs4YTAxQV8eFU48Lz89SRNBID40PGVsTDMxJTExPV9tIEMlYScmSDwkgv4mV1weFV4nIC8/DQJBIDM1IGUgQj1lJjE3O+7jM0g6MmYgDS0iIjg1RhBWUA0xNCU4SVZQLj1wPywwWTEiNT1lIu74J0E6Iid6", "opts": [{"k": "a", "t": "CTUxNyAxXnAhNXAmM04qIA0yNDUgQzsyMnM+UxBC9ow0KCI1DRJWYTw/NCwtAXA1PyI0J0hiNFgyLTcwSD13IjIzWlUSXEMnJD45SBJagvEiOipjXT8hNXAiJ0wwIUwhYQ4RYAN3JTZwU0VGUEMnKC817tHw4j9+"}, {"k": "b", "t": "DDkjMCotSzkiJSIkJkQtKwFzMSk3XDoyYSA1QEZb9oo8Mmw9QwJWMz4/IGUmDTE3JDUjM1ktNg0gJCg27uIhJDojElZbVkwhICF0SA5DLiMkPDZjXT83cDMqPEsrIlghIIXi7uw4YSM1QF1bRl46Ny16"}, {"k": "c", "t": "FCM/cyEmDRoWHx5lN0BiBH0aMmY17vU1LTozU0MeFV08Mz0hSFZWMiQiJjE2XzE2cDwgNe7vM0g6MmYjTDk4MzYzV10SUEMmLCkmTLWUgvM/cyEmDTMkPSAqIQ0yIEE8YScxTCw2Lyc1HA=="}, {"k": "d", "t": "FTk9Nio2WXAnMTk9PQ0sKg00IDIgWi4ubXMgXUJDQEhzKCIwRAVDLj45MSwvRDQkNDVlIkImIA02MiUqQysyM3M1RFlW9oc9IiU1XlZXNCIxPTEmDSIgIyAqIVkjZUxzKCgmRCsyLyc1HA=="}], "ans": "Iw==", "comment": "DnAzPCspWD4xP3BqM042MEwnLjRqSCEhbXMjRlFRXg0nMy03SFZQLj1wJSQxRJPkJjUsIQ0nZU8mIi0gWW8ngukyXllRWg0yMSM6WRcTMTEiMmUQSDMwIjkxKw0PLF4wLigjRCgiMzIkW19cGw0dgu87DbWaYTEgNisiXnAwPXAhN1kjKUU2YSUqXiKU6Cc5UV8IFV6Q4iN0XgNDJCI2kOggRDU2cDQgckg6NUIgKIXi7uw4YTwgV0JTVkQ8Ly04DQdGJHA1PTExSDckPXAmPUM2IFUnLmplXiowMzY0XRwSQ0ghMo/3QlZWYSQ/IyovQjcsMXAkPQ0jMUwwICgxSGF3AjIzWlUeFWcADgJ0SFZHKD01PDA3DSAqNDUocl4nNw0hJDAsXi4zLiB8El1TRg09gu87DRNLMTw5MCQuDTU2IzFlN1UyKl46guGGjiB3MjojRvOYWEQwIGI="}, {"map": "AGBjaXdzH2VlAz8jJlojN0hzEjM1XSMuYRA4U1lcFWsyKCAhXxNA", "q": "AHA1JSwn7vorMzkkckknZV06MSMpRCEyYT4/QURAVA0jIC87WRMTLyA9cwUzSCA1NSJqNEIwKEwnNSM3DT0yMjw8RFlWWg03JGwmSBFaMiQiKmUiQSQgIj4kJkQ0KgFzKSc2RW8zKCU1QFdXW1k2YSg7DRpcIjs2OikmDTVlNDU1PkI7ZUA2MisqDS4nguAjElFeUF8nIGJ0fANSLXA8Niw3WCIkcJPsckAjLF5zIik3XyojIGw=", "opts": [{"k": "a", "t": "BzE8OyRjSTVlIyU1IkE7ZU47IC8rAW8nLjojElESXEMnJCsmRBJSJTVwNyBjSTU1NT4hkYcsJkQybiQwRCMzYTU/WxBDQEgxMy0wTFZWYT9wIywzSDwsPjVlM04nLFk8NGYkXzsyJzIkXRBc9o48YS87QxBagvEmNilt"}, {"k": "b", "t": "BzE8OyRjSTVlMSUxN0M2LE4yguGGjiB7YSM/W0MSQUI3LmwkTBVcNTVwNj03SCIrP3AhN1snN0QyYSM9RCg+M3MddHESUUJzND8h7tdBKD9wNSwtTDxlMT4xN15iIUJzKCs1Qj0jYT0/ElJTVkY2Lyh6"}, {"k": "c", "t": "BzE8OyRjSTVlEx8XAQFiNUI6MmYnRC07KDwkV1NTRg0ZIDo1fhVBKCAkczYmQCA3NXAgKkghMFkyLGYrQm85ICU1VVFWWl9zJGw9ShhcMzE9czUsQZPoJDkmM15iIUJzMiM3WyYzLiF+"}, {"k": "d", "t": "BzE8OyRjSTVlFBwVfg0yKkQgYSllXS40Lic1ElRbQ0ghJik6WRMTJTUmNjcqTHA2NSJlMEEtNFg2ICIqDT84M3MzXlFBRkQ1KC817tHw4j9wMjA3Qj2G8SQsMUxiIUhzJSchQjx3MjY+QfOfQ0g6MmI="}], "ans": "IA==", "comment": "CTEjO2UnRCYgIjcgPFknaQ0hJCEsXjslOHMxXkRXR0MyNSUiQlZWYTQ1IyksVHAkIJP2IQ0jKUghNSdlXoz0LnMjW15TXF5zIiCXjAVAKDM/IGUnSHAjMTwtMw0sJA0wICIgRC53JTZwQUVCR0Q+JCIgQgUTJTVwIColWSckIjVrcmxiJkIhMyOGioz0LnM1XEZdWVs2YSA7Th1VKDw1cywuWCSG8SYgPgFiM0ghKCAsTi6U5pDzXRBWUA0yMj89QxdHNCIxfDUxQiYgPjmG+EMhLEx/YTQgSiYkNSEpElNdW1khLiA1SRkfYQMSHAhvDSAqPJPoJkQhJA03JGYnWCY7JXM1ElJeWlwmJCU7DRJWYTEiJyAlTCQqI3AsPEgxNUghICIqXmF3DnMgU1NdQUhzID0hRFbw6HA/cywtTpPvPjQsPRZiKg0jKDYgQSY5JHM2XVkSWg0xLiE2SB9BLnAzPChjSjE2PzwsPExs"}, {"map": "AGBkaXdzH2VlEyI8IlktIl8yMS4sTm8RIDo8R0JXRg==", "q": "ECUxP2UiTjgkND9lMV8rNVk8JjSGjCk+Ijxw8ZkSWEw6Mmw3X7WeNTkzPGUtQnAmNT6G818rKgFzIikrXiYzJCExXFRdFU48Lic9SFZAJCMjOiotcjkhcCMgPw0RIE4mMyNpDS02IjglQhBRWkBzJS0wQgUTMTUjICoiRCNlNT1lE2gRaGgQA2YgDTs4KjY+EkJXRkgnYT4xWAJaLTkqkOQ1SDxlID83ch92ZUU8Myc2Eg==", "opts": [{"k": "a", "t": "ABUDfgAAb3AgPXAnM04pMF1zMiMrXoz6NzY8ElUSQUI4JCJ0SRMTMzUjNjFjSSU3MTQqJ18taQ0jLjQ0WCp3JCsg8YVXWA0wLiIyRBJWLzM5MikqSTEhNXAgck4tK1khLiogDSsyYTA/XERTGw=="}, {"k": "b", "t": "ACUjkO8tTjkkcDQgckArK0Q1KCUk7uiU4jxwXF8Sf0wlIB83Xx9DNXxwIyoxXCUgcD4qP0gxZUk2YSAwQ4zwguY1QRBAUFs2LS05DRkTJzwlKypjSTFlMSApO04jhoqQ4illTCB3ICcxUVFcQUh9"}, {"k": "c", "t": "FCM/cyEmDQQJA3B0fB5iK0JzJzQqQzt7YSM/QEFHUA0lJD4n7sNWMnA+PDMiXnAsPSAgNkgvZUQ9MjYg7uiU4jxwRkJTUUQwKCM6TBoTMT8iczUxQigsNSNlPkglJEk8Mmg="}, {"k": "d", "t": "EzUjIyowWTFlZGB2cl0jN0xzNDUw7u4lKDxwUV9fQEB/YTw7XwdGJHA+NiIiX3AkMzU2IUJiJkI9Jy83QC53IHM1SllBQe75Ly89TFZXLnAiNiY2XyMqcDEhP0QsLF4nMycxRDk4bw=="}], "ans": "IA==", "comment": "AHAzPCghRD4kk/eG8UJiIUhzAAMWAAoUA3MgU0JTFUkyJSMnDQVWLyOT/jMmRCNlNXA3N14nMQ0nLi0gQ28lJCYkW1xbT+7yNyk4DRdeMTw5MmUqQCAkMyQqcl4tJ182YSUqQyk+JTY+UVlTWUQ3ICgxDRMTNT89MiEiDTQgcDMqPFkjaw0QLikuRCp3MjY9EmNXVlghJGwgTBtRgvk9c4bqDSA3PzIpN0AjaQ0+IDVlTG84MZD38ZNdFU48Mz4xWRcTIjEgJzAxTHAqcD6G6E4uIEJzIjQsXTs4JiGTk1ZbVkJzJSN0ThdALn5wHiwtRDYsMzGG9e7hKgFzFQoWDX55cnM1EgQCBg0jLigxQFZFKCIxIWUnRCMmJSM2kY4tZUk2YSc3XDo+NTYkR0JTGQ09gu87DRcTJzE8OyRjTiIsICQqck4nK1khICpr"}, {"map": "AGBlaXdzH2VlGT4vN042LEI9", "q": "Dz8jcyksSiNlNDFlE30LaQ0yYTQgXDo+MjqTlfORWg18Mik1XxVbfiFtdGUMf3AxNT4kPFkdLElzDQ8OaG9wZHRwHx0SR0gnLj46TFYBcWBwNmU1QjwwPTVlM0MtN0AyLWYhSG8lJCAlXkRTUUIgb2wFWBdfYSI1IDUsXiQkcCSG+04sLE4yYYXsDSI2KCBwU1RXRFgyJS10XRdBIHAxcyYiWCMkcCIkO1d9", "opts": [{"k": "a", "t": "CD46NiY3RD8rfHA1PV8zMEhzJCgxXy4zIHMzXV5GR0I/ICg1DRdfNTUiPDBjTHA2NT2G8EM2LE4yYSIkDSw4LyAlXkRTFUhzMykgQgRdLiVwNyQnQiNlNj83Mw0mKg02MiUqXSB3JCAgV0JTUUJ9"}, {"k": "b", "t": "EzEkNmUvRD0sJDkrNQFiNUIhMDMgDSIiKCcxQRBAUF4jLj8gTAUTc2BgczYmSiUsNDE2cl4nKF0hJGYsQys+IjI9ElFQQF48YS0hWRleICQ5KSQnQnAhNXAgPEkyKkQ9NWY17vU1LTozXR4="}, {"k": "c", "t": "EgMCFWljXT83ISUgclw3JEEiNCM3DT82M5DyX1VGR0JzJSl0TwNAIjFwIyonSHA2NSJlJ14jIUJzMSc3TG82LTAxXPOVVF9zMikmWx/w5j8jcywtWTU3Pj82cl4nZU48LzIsWyolYTIjQlFBGw=="}, {"k": "d", "t": "BCIiPGUnSHAkJSQgPFkrJkyQ5oXmQmN3MTwiQ0VXFVggNI/1Xx9cMnAxJjEmQyQsMzEhPV5iK1g9IidlSSohJCE5U10SVkI9Mjk4WRdBYTU+NzUsRD4xI3AhNw0yIF4iNC82TG8yLHMgQF9WQO70gu87Aw=="}], "ans": "IA==", "comment": "AHAgMjwvQjEhcDEpJkgwJA0yYSqGnig+IjJwVlESVkI9Mjk4WRcTJHA1KzUiQzQgcD9lIEg2Kl89LmplQSAwLnM/ElFRXUw3LmwkXx9egvEiOipj7vllGT4vN042LEI9b2YEDSI+NTo3U/OV9o48YS87XwRWNTFwNis1QjwzNXA1M18jKEgnMy8/TIzwgvA/HhBEVEE6JS2XirWQLnAgPDdjTDwpPycpO142aQ0cEwtlTyo6YTA/XFZbUlghICg7AVZHJCMkNjZjQzUiMSQsJEIxZUhzIDMxQj0+OzKTlfORWg0jLj50WRNdID4kczEiQDKG+T1lPExiJkw+ICIkDSsyYTcxVl9BGw0BIDgxDRpaLDkkczcmSSU/cDIkIFguLUJ/YSskXm85gvA/ElNdW142Mzg1DRVcLyMlPzEiDSYwPD4gIO7jM0g/bw=="}, {"map": "AGBmaXdzH2VlGT42N043N0hzBSM2RCg5", "q": "AHAiNiIxTHAhNXArN0qB9k46LmY1SD06KCc1ElFCR0IlID50XxNWLDI/PzYsDTEpJDU3M0MmKg0wLS8gQzsENTIkVw1TRV0hLjoxSVZdLnA2ISotWTUrNHAgckgsM0QyLyIqDR8WFRAYEh9AUEsmLygnAg1aJS1+cwpjTzEmOzUrNg0jNUg9IDVlXyowKCAkQFESWg02Mjg1SRkTMzUzNicqST9rcAEwM0FiI0w/KSdlbD8nEjYzEllBRkJzMykkXxNAJD4kMmUuSDwtPyJ6", "opts": [{"k": "a", "t": "BTUjOiItDTkrIzUiJ18taQ0jLjQ0WCp3LnM2XkVKWg0wLiIyRBcTJD1wNjY3TDQqcDQgMUQxhp4hKCllWyY5JTxwVl8SVkE6JCIgSFZWYT6T8CpjQD8hNTwkckQsM0whKCcrWSokYT0/EkNXR1s6JSMmAw=="}, {"k": "b", "t": "BzE8OyRjSTVlMyIsIlktIl8yJy8kAW8nLiEhR1USWg0wICEkQlZQLTk1PTEQWTExNXAhN1snN0QyYTIgX28kKDc/ElNdUUQ1KC81SRkTIj89cwciXjVzZHAkPFknNg03LmYgQzk+Ln0="}, {"k": "c", "t": "BzE8OyRjSTVlPzI2N180JE86LS8hTCsybXMgXUJDQEhzLSMzXlZXJHA+NiKAnjMsP3AhN1snN0QyLGY2WC0kNTokR1lAFVsyLSUwTLWUguU1IGU3XzErIzEmO0IsJEQgYSgqDS02Ijg1XFQc"}, {"k": "d", "t": "BzE8OyRjSTVlIyU1IkE7ZU47IC8rAW8nLiEhR1USWg0wLiEkQhhWLyQ1cxcmTDMxcCAgIEArMUQmYSMhRDs2M3M1QURTUUJzLSM3TBoTJSUiMis3SHAhNSAwIEyB4u7wLmYhQm85ICU1VVFWWl99"}], "ans": "IA==", "comment": "BCMjMmWAhHAkcCSG/10rJkxzJycpRS53JD5wQ0VXFUJzMiUnWRNeIHA2PCxjSTU2NT4tM0ktZV0yMydlTiA5JzoxQBBcWg0wLSUxQwJWYTU9czAuTHAhNTMsIe7hKg03JGYrSCiU8jA5XR4SdF0jEik3DRjw4j9wkOxjXpP2cCMkPEQ2LFcyM2YsQz8iNWhw8ZkSRV88NSkzSAQTKD4mMjcqTD4xNSN/clw3IEBzMSkhSG82MSE/RFFAGQ02LGwlWBdfYTUjJyQnQnAkPiQgIEQtNwFzMiknDT4iID9wU1zxkkw3IGB0ThleYSElMiwwDTUzOTSG+EMhLEwgb2YKDSE2NzY3U1RdRw09gu87DbWaYSQiOic2QzEpfnCG2w02IF4nJCswQyc2YTs/QURbWQM="}, {"map": "AGBnaXdzH2VlESUxOkgsMUQwIDIsQiF3BzI5XkVAUF4=", "q": "DnAxJyQgTD4xNXAxN142JA0hJDUgWW8zJHMjV15aVAFzMykhWR9fKCoxczEsRjUrcDErJkQlKg02YSiGjiB3JD02QFVcQUxzMyMgTLWUgvM/cyEmDSMgIyOG8UJiJF2Q8jVlWT04IjJwVlUSVl82JSk6Th9SLX5wAjAiQXAmPz4mPlgxho48YYXsDS53LDI5QRBCR0gwKD81Eg==", "opts": [{"k": "a", "t": "BzE8OyRjSTVlMSUxN0M2LE4yguGGjiB7YSM/QEFHUA0nLicxQwUTJTVwISAgWCAgIjGG9e7hKg02YTUgXjyU9DYjEl7xlkJzJyMmTBsTKD4mMikqSTEhPyNlPEJiJkQwLSllTj2U7Cc5UV8SUUhzKCgxQwJaJTE0Nms="}, {"k": "b", "t": "BzE8OyRjSTVlMSUxPV8rP0yQ5oXmQmN3MTwiQ0VXFUxzIiM6WRcTIj89JihjQ5PmP3AhN1snN0QyYTAsXjo2LToqU0ISVA0jM4/nXQRaIHAkNikiDTQgcDEpJkgwJO70guUqDSsyYSA1XFhTGw=="}, {"k": "c", "t": "BzE8OyRjSTVlEwMVfg0yKl8iNCNlWCI2YSM/XvOfQUQwIGwwSFZAIiI5IzFjXzU2JCIsJkQ0JA06LDYgSSYlKDJwQ0VTWVwmJD50WRNdNTEkOjMiDTQgcCIgIUg2ZV82LCkxQmE="}, {"k": "d", "t": "BzE8OyRjSTVlMjEmOVgyaQ0jLjQ0WCp3Mj0xQkNaWlkgYS06WR9ULiNwICAuXSIgcCA3N14nN1syLGY2SDwkguY1QRBE9ow/KCg1XlZWLHAyMisgQiNlIjUpM04rKkMyKDVr"}], "ans": "IA==", "comment": "EzUjNjFjWT8uNT5lIEgjNV88NyMsWYz2NzY8HhBYVEM2LS10QRldJjFwNmUwSCM2k/MqckOB5kJzMykxTCw+Lj0xVlESVF2Q8j90WQRcIjFwNyBjTiIgNDUrMUQjKQ0jJDQxSCE0JD5wU18SUUI+guE6RBkTJTVwEjA3RTUrJDkmM1krKkNzBycsQTolJCB+EnESVkI9NS10XRlXJHAxMCAwXjE3cDFlIl+B9l0hKCdlWSo7IGhwXRBCR0IxLSk5TFbw6HA/cyYqTjwqcDQgckQmIEMnKCIkSSp3L5DzXRBXW042Mz41X1ZQMzU0NisgRDEsI3AkPFkrIkwgYSggQG8lJDclSFlAFUcyLyk4TFZXJHAxMTAwQn4="}, {"map": "AGBoaXdzH2VlAz8jJlojN0hzLjRlaS4jIHMZXERXUl86NTV0axdaLSUiNjY=", "q": "DnAnNicrQj8ucDQgckknNUE8OGYkTio+NTJwV0ZXW1k8YS87QFZSMiM5PSQ3WCIkcDEwIUgsMUhzMDMkQys4YTxwQkJdQ0g3Lj50XxNHLiI+MmU3RD0gPyUxckhiJF0/KCUkDSk2LT8yU1NZFUw/LSMjA1Z8YSElNmUuSDwtPyJlNkgxJl82NyNlTG8hND8+V0JTV0Q/KCg1SRMM", "opts": [{"k": "a", "t": "CD4kNiIxRDQkNDVlNkhiNkI1NTEkXyp4JTI0XUMSRFg2Iz41SRcfYSA/ITQ2SHAqcCMsIVknKExzICUgRDs2YTYmV15GWg09gu87DQBWMzk2OiYiST9lNXAgKkghMFkyYSswSS45gvQxElNdW0s6gu0iSBod"}, {"k": "b", "t": "AyI/OCAtDREmMzU2IQ0BKkMnMykpAW8nLiEhR1USRFgyLT0hSAQTNTk9Nio2WXA2NT01IEhiIFwmKDAkQSp3IHMlQUXxlF86LmwnSBsTMTUiPiwwXpPmP3AxN0M2JEM3LmY3SCwiMyA/EllcQUghLyN6"}, {"k": "c", "t": "CD46NiY3RD8rfHA1PV8zMEhzNiMnRSA4KiBwR0NTWA0ZEgMaDRMTNT80PGUJfh8LcCAqNkhiNkghYS8rWSolMSE1RlFWWg0wLiE7DRVcLDE+NypjXTUpP3AqIFw3IF4nMychQj15"}, {"k": "d", "t": "DT83NCwtSnAgKDMgIV4rM0J/YTYqXz4iJHMiV1dbRlkhID50XRdKLT8xN2UnSHAyNTItPUIpZUeQ4GYzTCM+JTJwU0VGWkAyNSU3TBtWLyQ1cyRjQiIsNzUockkjZUw/NSM3TIzwgvA/HA=="}], "ans": "IA==", "comment": "DnAgISohQTUoMXCG+w0jJkg6NSc3DS47NTYiU/OV9o48YSgxDRNANTE0PGonSCApPyllIUgvZVs2My8jRCw2M3M5XERXUl86JS0wSFlSNCQ1PTEqTjkhMTQgckktZUglJCgxQmF3BzI8XlJTVkZzICA4QgETJD1wMjYwRD4kJCU3Mw0jMF42LzIgDYz+YSIlU0NXFVg+IGw3TARHIHA0NmUiQD83cCAkIExiLEMwKCIgQzsyb3MREl1bQUQ0II/z7tVcYSA1NyBjSzEsPHAmPkIxIEl/YSc2XiY5ICclQFESWk8hKCs1WbWAMzkxf2UxSCApMSllIl8tMUgwNS8qQ2N3KDc1X0BdQe75Ly89TFZWYSQiOikrTHAhNXAkJ0krMUIhKCdr"}, {"map": "AGBpaXdzH2VlAzUmJ18rMVRzDSkiSiY5JnMxXFQSdEE2Mzg9QxETBzE5PzAxSCM=", "q": "ECUxP2UvTDMwPjFlNkhiIUgnJCWGioz0LnM9U1lBFV0hJCYhSR9QLiVwMmUxSCM1PyMxMwFiJkI9Mi8hSD02Lzc/EkFHUA07LjkiSFYHcWNwISAzSCQsND9pch9ydQ0yL4XxQC47Ln9wU1xGUF8yguuXjhkTJTVwJyAtTD4xfHAgKl0tN1kyguGGjiB3LDIjQVlEVA02YSIxQx5GLHAxPyAxWTFlMTMsPUOB5Fs2LWYkQzsyMnM0XRBEVFcyLCk6WRkM", "opts": [{"k": "a", "t": "DT83NCwtSnAgcDEpN182LEM0YSAkQSc4Mn9wQl9ARFg2YSkiSBhHLiNwISAvSCYkPiQgIQ0nPUQgNS8kQG8+Mjw8U1RdRgFzLC0nDRjw4j9wJSwxTCIkPXAkPkgwMUxzIikrWSovNSYxXhBWUA0yIzknQlg="}, {"k": "b", "t": "BzE8OyRjSTVlMyIsIlktIl8yJy8kAW8nLiEhR1USWUI0Mmwn7sUTMpPzPGWAlyQgOSNlI1gjK0k8YTIqSSAkYTwjElNTWF08MmwxXgLw4j9wMCwlXzEhPyNlIkIsMUxzIGY1QiEjIH0="}, {"k": "c", "t": "BzE8OyRjSTVlMzEmOkhuZV08MzcwSG8lJCAgXUNGVF5zc3xkDRMTdWBjcyEmWzU3OTEocl4nNw0yMyskVyo5IDcxQRBCVF8yYSExQR5cMzEiczUmXzYqIj0kPE4nZUk8YRUKbmE="}, {"k": "d", "t": "BzE8OyRjSTVlBRlpcl0tN1wmJGYqDTokNJDxQFldFU48LDk5DRjw4j9wNyA1SCIsMXAzN19iKEg9MiciSCEkYTE/XFlGVF5zMDk1QxJcYSU9MmUCfRllPjUiMw0jJkggMilr"}], "ans": "IA==", "comment": "AGBpaXdzH2VlNT4jM1krP0xzLSkiSiY5JnM1ElFeUF8nKCIzA1ZyMCU5cyowDSMsPjEsIQ0nPUQgNS8kQGN3LDIjEl7xlkJzKS0iRBcTIj8iISAvTJPik/MqckwhLEI9guczSCNtYWdgARBAUF02NSUwQloTIykgMjYwDSAkIjFlYB1yaQ0nMykmTG8zJHMkV15TW1lzJGwxVQZcMyQxkOKAjj9lPTE2IUQ0JANzDSkiDT4iJHM+8ZNdFVs6My10TBpWMyQxcyssDT0qPTUrJkJiJkghNSll7uZ3JTqTk0JbWg2Q7CIgRBtcYTQ/cywtTjkhNT4xNxdiNu7gYSMoQiw+Lj0xElRXRUI6MmI="}, {"map": "AGFgaXdzH2VlHTk2OkwsIUE6LyFlQil3BCszV0BGXEI9ICB0bhldJTkkOiotXg==", "q": "ECUxPSEsDT9lIzU3JESB4kJzJSNlTDojLiE5SFHxku7wLmwyRBVSYTk+NywwXT8rk/0zN0FuZUxzABYMDT0yNTwiXFESWEI3LmwwSBFBIDQ1N3g3XyUgcDVlIkgwKEQnJGYqXSolIJD38ZNdFUw3LCU6RAVHMzEkOjMiDSAkIjFlP0wsMUghYRUJbGF3ECYxXhBRVFk2JiMmRBcTc2BiZmWAhHAoNTwtPV9iN0gjMyM2SCEjIDcxDQ==", "opts": [{"k": "a", "t": "DDkjOyQtSTwsPjdlPUtiAFUwJDYxRCA5ID9wcV9cUUQnKCM6XloTMT8iIjAmDTFlMz8rNkSB4u7wLmYgVSwyMTA5XV5TWQ01ICA8TFZSIzUiJyRjSHAmPz4mN0knZUyQ5oXmQm8kJD0j8Z1EUEF9"}, {"k": "b", "t": "CD46NiY3RD8rfHA1PV8zMEhzKCghRDwnLj05UFleXEkyJSl0XhNeMSI1cysiXjMgcDQgcl0jPEE8ICJlTiA6YTIjQlFBFUImYS81XxdQNTUiNjZjSCM1NTMsM0QxZUMyYRMXYWE="}, {"k": "c", "t": "EiUgIyk6DRMtMTkrcmsjLEEmMyM2AW8nLiEhR1USQUI3Lmw5QhJcYTQ1NDciSTEhP3AhN10nK0k2YSIgDT82IjwkVxBXTVk2MyI7DQBGLT41IYbiWzUpcDUocl83K1k6LCNr"}, {"k": "d", "t": "EjUzJjcqWSllHTk2MUIsI0Q0NDQkWSY4L39wQl9ARFg2YSE1QwJWM3ADHwRj7vllIzUoIl8nZU48LyAsSjolIJD38ZNdFUQ9MikzWARSbXA9NjYuQnA2NT1lO0AyJE4nLmYhSG8nJCE9W0NB9o48bw=="}], "ans": "IA==", "comment": "AGFgaXdzH2VlMz8nIEhiKEwmYTI3TDs2LDY+Rl8SUUhzIiM6SR/w5pPlNjZjSCgmNSAmO0IsJEQgbWYsQyw7NDo+Vl8SU0w/KS0mDRdRJCIkPGtjfCUkPjQqckw3MUIhKDwk7uiU4jxwUVFbGQ08YT89XgJWLDFwNyA1SHArNTckIAFiIUg0MychTD13Ijw9EkNXUlghICKXihcTLiVwOjYsQTE3cDYpJ1UtZV42LzWGgDkyLX1wYlVAWEQnKD50TBJeKD5wIyQxTHA2MTwzM19iFmESYYXsDTslLjAxQBBbW0k6Mjw7Qx9RKDw5NyQnSHA1PyJlO0MhLEk2LzIgDT+U+zE8W1NdFU48LGwEQgFWMwA/Ois3DTU9NTMwJkQ0KgM="}];
+
+function xorDecode(b64) {
+  const bin = atob(b64);
+  let out = '';
+  for (let i = 0; i < bin.length; i++) {
+    out += String.fromCharCode(bin.charCodeAt(i) ^ SALT.charCodeAt(i % SALT.length));
+  }
+  return decodeURIComponent(escape(out));
+}
+function decodeData() {
+  return ENCODED.map(item => ({
+    map: xorDecode(item.map),
+    q: xorDecode(item.q),
+    opts: item.opts.map(o => ({ k:o.k, t:xorDecode(o.t) })),
+    ans: xorDecode(item.ans),
+    comment: xorDecode(item.comment)
+  }));
+}
+const QUESTIONS = decodeData();
+
+function tick(){ document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR'); }
+setInterval(tick,1000); tick();
+document.getElementById('date').valueAsDate = new Date();
+
+function start(){
+  const n = document.getElementById('name').value.trim();
+  if(!n){ alert('Digite o nome para o certificado. A pimenta não certifica fantasma.'); return; }
+  document.getElementById('intro').classList.remove('active');
+  document.getElementById('challenge').classList.add('active');
+  renderQuestions();
+  window.scrollTo(0,0);
+}
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function renderQuestions(){
+  const box=document.getElementById('questions');
+  box.innerHTML='';
+  QUESTIONS.forEach((q,idx)=>{
+    const opts=shuffle(q.opts);
+    const card=document.createElement('div');
+    card.className='question-card';
+    card.id='qcard-'+idx;
+    card.innerHTML = `<div class="q-head"><span class="q-num">Q${String(idx+1).padStart(2,'0')}</span><span class="q-text">${q.q}</span></div><div class="opts">`+
+      opts.map((o,i)=>`<label class="opt" data-q="${idx}" data-k="${o.k}"><input type="radio" name="q${idx}" value="${o.k}" onchange="updateProgress()"><span class="mark">${String.fromCharCode(65+i)}</span><span>${o.t}</span></label>`).join('')+
+      `</div><div style="padding:0 18px 14px;color:#b77a68;font-family:var(--mono);font-size:10px;letter-spacing:1px">MAPEAMENTO COBRADO: conteúdo ofuscado no fonte // avalia ${q.map}</div>`;
+    box.appendChild(card);
+  });
+  updateProgress();
+}
+function updateProgress(){
+  let answered=0;
+  QUESTIONS.forEach((q,i)=>{ if(document.querySelector(`input[name="q${i}"]:checked`)) answered++; });
+  document.getElementById('progress').textContent = `${answered} de ${QUESTIONS.length} respondidas`;
+}
+function grade(){
+  let correct=0, missing=[];
+  QUESTIONS.forEach((q,i)=>{
+    const selected=document.querySelector(`input[name="q${i}"]:checked`);
+    if(!selected) missing.push(i+1);
+  });
+  if(missing.length){ alert('Faltam respostas: '+missing.join(', ')+'. AppSec sem evidência vira reunião motivacional.'); return; }
+  document.querySelectorAll('.opt').forEach(el=>el.classList.remove('correct','wrong'));
+  const comments=[];
+  QUESTIONS.forEach((q,i)=>{
+    const selected=document.querySelector(`input[name="q${i}"]:checked`);
+    const sel=selected.value;
+    if(sel===q.ans) correct++;
+    document.querySelectorAll(`.opt[data-q="${i}"]`).forEach(el=>{
+      if(el.dataset.k===q.ans) el.classList.add('correct');
+      if(el.dataset.k===sel && sel!==q.ans) el.classList.add('wrong');
+    });
+    comments.push(`<div class="comment"><strong>Q${String(i+1).padStart(2,'0')} // ${q.map}</strong><br>Resultado: ${sel===q.ans ? '<span class="green">correto</span>' : '<span class="red">incorreto</span>'}<br>${q.comment}</div>`);
+  });
+  const pct=Math.round((correct/QUESTIONS.length)*100);
+  document.getElementById('results').style.display='block';
+  document.getElementById('scoreNum').textContent=pct+'%';
+  const threshold=parseInt(document.getElementById('mode').value,10);
+  document.getElementById('scoreMsg').innerHTML = pct>=threshold
+    ? `Aprovado. Você sobreviveu ao molho de pimenta AppSec. Acertos: ${correct}/${QUESTIONS.length}.`
+    : `Ainda não certifica. Acertos: ${correct}/${QUESTIONS.length}. O atacante agradece, o CISO chora e o backlog ganha mais um épico.`;
+  document.getElementById('comments').innerHTML=comments.join('');
+  if(pct>=threshold) unlockCert(pct); else lockCert(pct, threshold);
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+function hashString(s){
+  let h=0x811c9dc5;
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h+=(h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24);}
+  return ('00000000'+(h>>>0).toString(16)).slice(-8).toUpperCase();
+}
+function unlockCert(pct){
+  const name=document.getElementById('name').value.trim();
+  const date=document.getElementById('date').value || new Date().toISOString().slice(0,10);
+  const id=hashString(name+'|'+date+'|'+pct+'|APPSEC-PEPPER-OWASP2025|221a8910c8bd');
+  document.getElementById('certName').textContent=name;
+  document.getElementById('certDate').textContent=date.split('-').reverse().join('/');
+  document.getElementById('certScore').textContent=pct+'%';
+  document.getElementById('certHash').textContent='BS-'+id;
+  document.getElementById('certWrap').style.display='block';
+  document.getElementById('certLock').style.display='none';
+}
+function lockCert(pct, threshold){
+  document.getElementById('certWrap').style.display='none';
+  const l=document.getElementById('certLock');
+  l.style.display='block';
+  l.textContent=`Certificado bloqueado: mínimo exigido ${threshold}%. Resultado atual: ${pct}%. Refaz com calma, porque produção não perdoa clique confiante.`;
+}
+function resetAnswers(){
+  document.querySelectorAll('input[type=radio]').forEach(i=>i.checked=false);
+  document.querySelectorAll('.opt').forEach(el=>el.classList.remove('correct','wrong'));
+  document.getElementById('results').style.display='none';
+  updateProgress();
+}
+function showTab(id, btn){
+  document.querySelectorAll('.evidence').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); btn.classList.add('active');
+}
+function filterEvidence(){
+  const term=document.getElementById('filter').value.trim().toLowerCase();
+  document.querySelectorAll('.evidence-text').forEach(el=>{
+    const raw=el.textContent;
+    if(!term){ el.innerHTML=raw; return; }
+    const safe=raw.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const re=new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    el.innerHTML=safe.replace(re,m=>`<span style="background:#ff6b00;color:#160302">${m}</span>`);
+  });
+}
+function clearFilter(){ document.getElementById('filter').value=''; location.reload(); }
+function downloadCert(){
+  const cert=document.getElementById('certificate');
+  html2canvas(cert, {scale:2, backgroundColor:null}).then(canvas=>{
+    const a=document.createElement('a');
+    const name=(document.getElementById('name').value.trim()||'certificado').replace(/[^a-z0-9]+/gi,'_').toLowerCase();
+    a.href=canvas.toDataURL('image/png');
+    a.download=`appsec_pepper_be_safe_${name}.png`;
+    a.click();
+  });
+}
+</script>
+</body>
+</html>
